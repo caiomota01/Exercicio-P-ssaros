@@ -1,2 +1,2 @@
-# Exercicio-P-ssaros
+# ExercicioPassaros
 Exercicio Pássaro
