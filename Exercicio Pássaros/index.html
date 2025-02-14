@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <title>Exercício do Pássaro</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #87CEEB;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    // Configuração do jogo
+    var config = {
+        type: Phaser.AUTO,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var game = new Phaser.Game(config);
+    var passaros = []; // Lista para armazenar vários pássaros
+    var quantidadeDePassaros = 5; // Define quantos pássaros serão criados
+
+    // Carrega as imagens e sprites
+    function preload() {
+        this.load.image('bg', 'assets/ceuazul.png');
+        this.load.spritesheet('bird', 'assets/Passaro.png', { frameWidth: 165, frameHeight: 125 });
+    }
+
+    // Cria os elementos do jogo
+    function create() {
+        this.add.image(config.width / 2, config.height / 2, 'bg').setDisplaySize(config.width, config.height);
+
+        // Criar a animação de voo do pássaro
+        this.anims.create({
+            key: 'fly',
+            frames: this.anims.generateFrameNumbers('bird', { start: 0, end: 7 }),
+            frameRate: 12,
+            repeat: -1
+        });
+
+        // **Usei um loop FOR para criar vários pássaros**
+        for (let i = 0; i < quantidadeDePassaros; i++) {
+            let xInicial = Phaser.Math.Between(100, config.width - 100);
+            let yInicial = Phaser.Math.Between(100, config.height - 100);
+            let escala = Phaser.Math.FloatBetween(0.5, 0.8); // Tamanhos aleatórios
+
+            let passarinho = this.add.sprite(xInicial, yInicial, 'bird').setScale(escala);
+            passarinho.anims.play('fly', true);
+
+            // Direção e velocidade aleatórias para cada pássaro
+            passarinho.ida = Math.random() < 0.5; // Define se começa indo para direita ou esquerda
+            passarinho.subindo = Math.random() < 0.5; // Define se começa subindo ou descendo
+            passarinho.velocidadeX = Phaser.Math.Between(3, 7);
+            passarinho.velocidadeY = Phaser.Math.Between(3, 7);
+
+            passaros.push(passarinho); // Adiciona o pássaro ao array
+        }
+    }
+
+    // Função de atualização do jogo
+    function update() {
+        for (let passarinho of passaros) {
+            let limiteDireita = config.width - 100;
+            let limiteEsquerda = 100;
+            let limiteSuperior = 100;
+            let limiteInferior = config.height - 100;
+
+            // **Movimento horizontal**
+            if (passarinho.ida) {
+                passarinho.x += passarinho.velocidadeX;
+                if (passarinho.x >= limiteDireita) {
+                    passarinho.ida = false;
+                    passarinho.setFlipX(true);
+                }
+            } else {
+                passarinho.x -= passarinho.velocidadeX;
+                if (passarinho.x <= limiteEsquerda) {
+                    passarinho.ida = true;
+                    passarinho.setFlipX(false);
+                }
+            }
+
+            // **Movimento vertical**
+            if (passarinho.subindo) {
+                passarinho.y -= passarinho.velocidadeY;
+                if (passarinho.y <= limiteSuperior) {
+                    passarinho.subindo = false;
+                }
+            } else {
+                passarinho.y += passarinho.velocidadeY;
+                if (passarinho.y >= limiteInferior) {
+                    passarinho.subindo = true;
+                }
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
